@@ -11,6 +11,10 @@ MainGame::MainGame() {
 	height = 600;
 	gameState = GameState::PLAY;	
 	camera2D.init(width, height);
+	ShowData = false;
+	totalHumans = humans.size();
+	totalZombies = zombies.size();
+
 }
 
 MainGame::~MainGame() {
@@ -71,6 +75,20 @@ void MainGame::handleInput()
 	if (inputManager.isKeyPressed(SDL_BUTTON_MIDDLE)) {
 		//cout << "CLICK CENTRO" << endl;
 	}
+	if (inputManager.isKeyPressed(SDLK_f)) {
+		/*if (this->ShowData) {
+			this->ShowData = false;
+		}
+		else {*/
+			this->ShowData = true;
+			system("cls");
+			cout << "DATOS :_________________________" << endl;
+			cout << "cantidad de zombies : " << zombies.size() << endl;
+			cout << "cantidad de humanos  : " << humans.size() << endl;
+		//}
+		
+	}
+
 }
 
 void MainGame::createBullet() {
@@ -133,10 +151,12 @@ void MainGame::initLevel() {
 	const std::vector<glm::vec2>& zombiePosition =
 		levels[currentLevel]->getZombiesPosition();
 
-	for (size_t i = 0; i < zombiePosition.size(); i++)
+	for (size_t i = 0; i < 150; i++)
 	{
 		zombies.push_back(new Zombie());
-		zombies.back()->init(1.3f, zombiePosition[i]);
+		glm::vec2 posZ(randPosX(randomEngine) * TILE_WIDTH,
+			randPosY(randomEngine) * TILE_WIDTH);
+		zombies.back()->init(1.3f, posZ);
 	}
 	spriteFont = new SpriteFont("Fonts/arial.ttf",64);
 
@@ -174,6 +194,8 @@ void MainGame::draw() {
 	glBindTexture(GL_TEXTURE_2D, 0);
 	program.unuse();
 	window.swapWindow();
+	
+
 }
 
 void MainGame::drawHud()
@@ -215,6 +237,16 @@ void MainGame::updateElements() {
 				delete humans[j];
 				humans[j] = humans.back();
 				humans.pop_back();
+				if(this->ShowData){
+					this->totalHumans = humans.size();
+					this->totalZombies = zombies.size();
+					system("cls");
+					cout << "DATOS : ____________________" << endl;
+					cout << "cantidad de zombies : " << this->totalZombies << endl;
+					cout << "cantidad de humanos  : " << this->totalHumans << endl;
+				}
+
+
 			}
 		}
 	}
@@ -228,6 +260,7 @@ void MainGame::updateElements() {
 			i++;
 		}
 	}
+
 }
 
 void MainGame::update() {
@@ -237,5 +270,6 @@ void MainGame::update() {
 		camera2D.setPosition(player->getPosition());
 		processInput();
 		updateElements();
+
 	}
 }

@@ -37,6 +37,12 @@ private:
 	Sprite sprite;
 	Camera2D camera2D;
 	InputManager inputManager;
+	//para habilitar la muestra de informacion
+	bool ShowData;
+
+	int totalHumans;
+	int totalZombies;
+
 	void init();
 	void initLevel();
 	void processInput();
