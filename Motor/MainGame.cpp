@@ -15,6 +15,9 @@ MainGame::MainGame() {
 	totalHumans = humans.size();
 	totalZombies = zombies.size();
 
+	activeChangeLevel=false;
+	curLevel=0;
+
 }
 
 MainGame::~MainGame() {
@@ -89,6 +92,51 @@ void MainGame::handleInput()
 		
 	}
 
+	if (inputManager.isKeyPressed(SDLK_n)){
+		this->activeChangeLevel = true;
+		system("cls");
+		cout << "ingresa el level que quiere establecer";
+	}
+	if (inputManager.isKeyPressed(SDLK_1)) {
+		if(this->activeChangeLevel){
+			currentLevel = 0;
+			curLevel = 0;
+			vector<Human*> humansv1;
+			vector<Zombie*> zombiesv1;
+			this->humans = humansv1;
+			this->zombies = zombiesv1;
+			initLevel();
+		}
+	}
+	if (inputManager.isKeyPressed(SDLK_2)) {
+		if (this->activeChangeLevel) {
+			currentLevel = 1;
+			curLevel = 1;
+
+			vector<Human*> humansv2;
+			vector<Zombie*> zombiesv2;
+
+			this->humans = humansv2;
+			this->zombies = zombiesv2;
+
+			initLevel();
+		}
+	}
+	if (inputManager.isKeyPressed(SDLK_3)) {
+		if (this->activeChangeLevel) {
+			currentLevel = 2;
+			curLevel = 2;
+
+			vector<Human*> humansv3;
+			vector<Zombie*> zombiesv3;
+			this->humans = humansv3;
+			this->zombies = zombiesv3;
+			initLevel();
+		}
+	}
+
+
+
 }
 
 void MainGame::createBullet() {
@@ -127,7 +175,9 @@ void MainGame::init() {
 
 void MainGame::initLevel() {
 	levels.push_back(new Level("Level/level1.txt"));
-	currentLevel = 0;
+	levels.push_back(new Level("Level/level2.txt"));
+	levels.push_back(new Level("Level/level3.txt"));
+	currentLevel =curLevel;
 	//inicializar humans,player y zombie
 	player = new Player();
 	player->init(5.0f, levels[currentLevel]->getPlayerPosition(), &inputManager);
@@ -151,7 +201,7 @@ void MainGame::initLevel() {
 	const std::vector<glm::vec2>& zombiePosition =
 		levels[currentLevel]->getZombiesPosition();
 
-	for (size_t i = 0; i < 150; i++)
+	for (size_t i = 0; i < 80; i++)
 	{
 		zombies.push_back(new Zombie());
 		glm::vec2 posZ(randPosX(randomEngine) * TILE_WIDTH,
@@ -195,6 +245,15 @@ void MainGame::draw() {
 	program.unuse();
 	window.swapWindow();
 	
+	if (this->humans.size()<50&&currentLevel<2) {
+		this->currentLevel += 1;
+		this->curLevel += 1;
+		vector<Human*> humansv4;
+		vector<Zombie*> zombiesv4;
+		this->humans = humansv4;
+		this->zombies = zombiesv4;
+		initLevel();
+	}
 
 }
 
@@ -245,6 +304,7 @@ void MainGame::updateElements() {
 					cout << "cantidad de zombies : " << this->totalZombies << endl;
 					cout << "cantidad de humanos  : " << this->totalHumans << endl;
 				}
+				
 
 
 			}
@@ -255,11 +315,14 @@ void MainGame::updateElements() {
 		if (bullets[i]->update()) {
 			bullets[i] = bullets.back();
 			bullets.pop_back();
+
+
 		}
 		else {
 			i++;
 		}
 	}
+	
 
 }
 
@@ -270,6 +333,7 @@ void MainGame::update() {
 		camera2D.setPosition(player->getPosition());
 		processInput();
 		updateElements();
+		
 
 	}
 }

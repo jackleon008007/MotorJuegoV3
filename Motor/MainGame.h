@@ -43,6 +43,9 @@ private:
 	int totalHumans;
 	int totalZombies;
 
+	bool activeChangeLevel;
+	int curLevel;
+
 	void init();
 	void initLevel();
 	void processInput();
