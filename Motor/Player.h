@@ -12,5 +12,7 @@ public:
 	void init(float speed, glm::vec2 position,InputManager* inputManager);
 	void update(const vector<string>& levelData, vector<Human*>& humans,
 		vector<Zombie*>& zombies);
+
+	bool collideWithAgent(Agent* agent);
 };
 

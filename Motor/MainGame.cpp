@@ -14,7 +14,11 @@ MainGame::MainGame() {
 	ShowData = false;
 	totalHumans = humans.size();
 	totalZombies = zombies.size();
-
+	for(int i=0;i<3;++i){
+		levelVelocityZombie.push_back(2.9f+i);
+	}
+	playerLifes = 3;
+	bulletDirection = 0;
 	activeChangeLevel=false;
 	curLevel=0;
 
@@ -135,20 +139,35 @@ void MainGame::handleInput()
 		}
 	}
 
+	if (inputManager.isKeyPressed(SDLK_w)) {
+		bulletDirection = 2;
+	}
+
+	if (inputManager.isKeyPressed(SDLK_s)) {
+		bulletDirection = 3;
+	}
+
+	if (inputManager.isKeyPressed(SDLK_a)) {
+		bulletDirection = 1;
+	}
+
+	if (inputManager.isKeyPressed(SDLK_d)) {
+		bulletDirection = 0;
+	}
+
 
 
 }
 
 void MainGame::createBullet() {
-	glm::vec2 mouseCoords = 
-			camera2D.convertToScreenWorld(inputManager.getMouseCoords());
+	glm::vec2 mouseCoords = camera2D.convertToScreenWorld(inputManager.getMouseCoords());
 	glm::vec2 playerPosition(0, 0);
 	glm::vec2 direction = mouseCoords - player->getPosition();
 	direction = glm::normalize(direction);
 	//bullets.emplace_back(playerPosition, direction, 1.0f, 1000);
 	
 	//bullets.push_back(new Bullet(playerPosition, direction, 1.0f, 1000));
-	Bullet* bullet = new Bullet(player->getPosition(), direction, 1.0f, 1000);
+	Bullet* bullet = new Bullet(player->getPosition(), direction, 4.0f, 1000, bulletDirection);
 	bullets.push_back(bullet);
 }
 
@@ -204,7 +223,7 @@ void MainGame::initLevel() {
 	for (size_t i = 0; i < zombiePosition.size(); i++)
 	{
 		zombies.push_back(new Zombie());
-		zombies.back()->init(3.9f, zombiePosition[i]);
+		zombies.back()->init(levelVelocityZombie[curLevel], zombiePosition[i]);
 	}
 	spriteFont = new SpriteFont("Fonts/arial.ttf",64);
 
@@ -243,7 +262,7 @@ void MainGame::draw() {
 	program.unuse();
 	window.swapWindow();
 	
-	if (this->humans.size()<50&&currentLevel<2) {
+	if (this->zombies.size()<1&&currentLevel<2) {
 		this->currentLevel += 1;
 		this->curLevel += 1;
 		vector<Human*> humansv4;
@@ -278,6 +297,18 @@ void MainGame::run() {
 }
 
 void MainGame::updateElements() {
+
+	if(playerLifes<1){
+		system("cls");
+		cout << "*********************"<<endl;
+		cout << "*                   *"<<endl;
+		cout << "*    GAME OVER      *"<< endl;
+		cout << "*                   *"<< endl;
+		cout << "*********************"<< endl;
+		glClearColor(0.5f,0.4f,0.3f,1.0f);
+		return;
+	}
+
 	player->update(levels[currentLevel]->getLevelData(), humans, zombies);
 	for (size_t i = 0; i < humans.size(); i++)
 	{
@@ -313,14 +344,70 @@ void MainGame::updateElements() {
 		if (bullets[i]->update()) {
 			bullets[i] = bullets.back();
 			bullets.pop_back();
-
-
 		}
 		else {
 			i++;
 		}
 	}
 	
+	for (size_t i = 0; i < bullets.size(); i++) {
+		bullets[i]->update();
+		for (size_t j = 0; j < zombies.size(); j++)
+		{
+			if (bullets[i]->collideWithAgent(zombies[j])) {
+				delete zombies[j];
+				zombies[j] = zombies.back();
+				zombies.pop_back();
+				
+	
+				if (this->ShowData) {
+					this->totalHumans = humans.size();
+					this->totalZombies = zombies.size();
+					system("cls");
+					cout << "DATOS : ____________________" << endl;
+					cout << "cantidad de zombies : " << this->totalZombies << endl;
+					cout << "cantidad de humanos  : " << this->totalHumans << endl;
+				}
+
+			}
+		}
+	}
+	for (size_t i = 0; i < bullets.size();)
+	{
+		if (bullets[i]->update()) {
+			bullets[i] = bullets.back();
+			bullets.pop_back();
+		}
+		else {
+			i++;
+		}
+	}
+
+	for (size_t i = 0; i < bullets.size(); i++) {
+			if (bullets[i]->collideWithLevel(levels[currentLevel]->getLevelData())) {
+				delete bullets[i];
+				bullets[i] = bullets.back();
+				bullets.pop_back();
+				
+			}
+	}
+	for (size_t i = 0; i < zombies.size(); i++) {
+		if (player->collideWithAgent(zombies[i])){
+			playerLifes = playerLifes - 1;
+			delete zombies[i];
+			zombies[i] = zombies.back();
+			zombies.pop_back();
+			system("cls");
+			cout << "*********************" << endl;
+			cout << "*                   *" << endl;
+			cout << "*    - 1 vida       *" << endl;
+			cout << "*    "<<"Te quedan: "<< playerLifes<<" *" << endl;
+			cout << "*********************" << endl;
+
+		
+		}
+	}
+
 
 }
 

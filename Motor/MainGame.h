@@ -45,6 +45,12 @@ private:
 
 	bool activeChangeLevel;
 	int curLevel;
+	vector<float> levelVelocityZombie;
+
+	int playerLifes;
+	int bulletDirection;
+
+
 
 	void init();
 	void initLevel();
