@@ -201,12 +201,10 @@ void MainGame::initLevel() {
 	const std::vector<glm::vec2>& zombiePosition =
 		levels[currentLevel]->getZombiesPosition();
 
-	for (size_t i = 0; i < 80; i++)
+	for (size_t i = 0; i < zombiePosition.size(); i++)
 	{
 		zombies.push_back(new Zombie());
-		glm::vec2 posZ(randPosX(randomEngine) * TILE_WIDTH,
-			randPosY(randomEngine) * TILE_WIDTH);
-		zombies.back()->init(1.3f, posZ);
+		zombies.back()->init(3.9f, zombiePosition[i]);
 	}
 	spriteFont = new SpriteFont("Fonts/arial.ttf",64);
 
